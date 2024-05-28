@@ -4,18 +4,19 @@ import db from "../database.js";
 // get | get semua data
 export const getData = async (req, res) => {
   const queryBarang = "SELECT * FROM barang";
-  try {
-    const result = await db.query(queryBarang);
-    res.status(200).json({
-      data: result,
-      message: "Berhasil mengambil semua data",
-    });
-  } catch (error) {
-    res.status(500).json({
-      data: result,
-      message: "Gagal mengambil semua data",
-    });
-  }
+  db.query(queryBarang, (error, result) => {
+    if (error) {
+      res.status(500).json({
+        message: "Gagal mengambil semua data",
+        error: error,
+      });
+    } else {
+      res.status(200).json({
+        data: result,
+        message: "Berhasil mengambil semua data",
+      });
+    }
+  });
 };
 
 // post | post tambah data
