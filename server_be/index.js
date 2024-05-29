@@ -9,6 +9,7 @@ const port = 3000;
 
 // middleware
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms"));
 
