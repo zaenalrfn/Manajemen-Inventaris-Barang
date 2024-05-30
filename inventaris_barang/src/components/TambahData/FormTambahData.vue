@@ -49,10 +49,21 @@ import axios from "axios";
 import { reactive } from "vue";
 import { useToast } from "primevue/usetoast";
 import Toast from "primevue/toast";
+import { onMounted } from "vue";
 
 const toast = useToast();
 
 const emit = defineEmits(["dialog"]);
+const props = defineProps({
+  paramsId: {
+    type: Number,
+    required: true,
+  },
+  edit: {
+    type: Boolean,
+    required: true,
+  },
+});
 
 // bagian untuk menyimpan data dari input user
 const barang = reactive({
@@ -60,6 +71,23 @@ const barang = reactive({
   quantity: "",
   price: "",
 });
+
+// bagian load barang yang mau diupdate
+const loadBarang = async (id) => {
+  try {
+    const response = await axios.get(`http://localhost:3000/api/getData/${id}`);
+    const data = response.data.data;
+    for (let d of data) {
+      barang.nama = d.nama;
+      barang.quantity = d.quantity;
+      barang.price = d.price;
+    }
+
+    console.log(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const show = () => {
   toast.add({
@@ -73,14 +101,31 @@ const show = () => {
 // bagian fungsi untuk menghandle tambah data
 const handleSubmit = async () => {
   try {
-    await axios.post("http://localhost:3000/api/tambahBarang", {
-      nama: barang.nama,
-      quantity: barang.quantity,
-      price: barang.price,
-    });
+    if (props.edit) {
+      await axios.put(
+        `http://localhost:3000/api/editBarang/${props.paramsId}`,
+        {
+          nama: barang.nama,
+          quantity: barang.quantity,
+          price: barang.price,
+        }
+      );
+    } else {
+      await axios.post("http://localhost:3000/api/tambahBarang", {
+        nama: barang.nama,
+        quantity: barang.quantity,
+        price: barang.price,
+      });
+    }
+    emit("dialog");
   } catch (error) {
     console.log(error);
   }
-  emit("dialog");
 };
+
+onMounted(() => {
+  if (props.edit) {
+    loadBarang(props.paramsId);
+  }
+});
 </script>

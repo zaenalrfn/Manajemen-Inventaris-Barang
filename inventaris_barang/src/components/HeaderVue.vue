@@ -28,12 +28,20 @@ import Menu from "primevue/menu";
 import Sidebar from "primevue/sidebar";
 import FormTambahData from "../components/TambahData/FormTambahData.vue";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 const visible = ref(false);
 const dialogOpen = ref(false);
+const router = useRouter();
 
 const items = ref([
-  { label: "Inventaris Barang", icon: "pi pi-home" },
+  {
+    label: "Inventaris Barang",
+    icon: "pi pi-home",
+    command: () => {
+      router.push("/");
+    },
+  },
   {
     label: "Tambah Data Barang",
     icon: "pi pi-plus",
@@ -41,7 +49,13 @@ const items = ref([
       dialogOpen.value = true;
     },
   },
-  { label: "Lihat Data Barang", icon: "pi pi-table" },
+  {
+    label: "Lihat Data Barang",
+    icon: "pi pi-table",
+    command: () => {
+      router.push("/dataBarang");
+    },
+  },
 ]);
 
 const closeDialog = () => {

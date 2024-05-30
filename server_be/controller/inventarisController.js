@@ -1,19 +1,56 @@
 // import database
+import exp from "constants";
 import db from "../database.js";
-
+import util from "util";
+import { error } from "console";
+const queryAsync = util.promisify(db.query).bind(db);
 // get | get semua data
 export const getData = async (req, res) => {
-  const queryBarang = "SELECT * FROM barang";
-  db.query(queryBarang, (error, result) => {
-    if (error) {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
+
+  const queryPagination = "SELECT * FROM barang LIMIT ? OFFSET ?";
+  const totalBarang = "SELECT COUNT(*) as count FROM barang";
+
+  try {
+    // Execute both queries in parallel using Promise.all
+    const [dataBarang, hasilTotal] = await Promise.all([queryAsync(queryPagination, [limit, offset]), queryAsync(totalBarang)]);
+
+    const total = hasilTotal[0].count;
+    const totalHalaman = Math.ceil(total / limit);
+
+    res.status(200).json({
+      data: dataBarang,
+      pagination: {
+        halaman: page,
+        total,
+        totalHalaman,
+      },
+      message: "Berhasil mengambil semua data",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Gagal mengambil semua data",
+      error: error.message,
+    });
+  }
+};
+
+// get | get data by id
+export const getDataById = (req, res) => {
+  const id = req.params.id;
+  const queryBarang = "SELECT * FROM barang WHERE id=?";
+  db.query(queryBarang, id, (err, result) => {
+    if (err) {
       res.status(500).json({
-        message: "Gagal mengambil semua data",
-        error: error,
+        message: "Gagal mengambil data by id",
+        eror: err,
       });
     } else {
       res.status(200).json({
         data: result,
-        message: "Berhasil mengambil semua data",
+        message: "Berhasil mengambil data by id",
       });
     }
   });

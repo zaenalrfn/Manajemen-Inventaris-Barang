@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- bagian side bar -->
-    <div class="main-content mt-5 p-2">
+    <div class="main-content">
       <div
         class="dashboard-informasi flex md:flex-row flex-column justify-content-center w-full gap-2"
       >

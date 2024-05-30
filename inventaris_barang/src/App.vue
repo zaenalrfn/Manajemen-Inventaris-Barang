@@ -1,6 +1,8 @@
 <template>
   <HeaderVue />
-  <RouterView />
+  <div class="mt-2 p-5">
+    <RouterView />
+  </div>
 </template>
 
 <script setup>
