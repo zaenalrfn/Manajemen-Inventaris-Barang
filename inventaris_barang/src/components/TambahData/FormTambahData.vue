@@ -9,6 +9,7 @@
           class="flex-auto"
           autocomplete="off"
           v-model="barang.nama"
+          required="true"
         />
       </div>
       <div class="flex align-items-center gap-3 mb-5">
@@ -17,6 +18,7 @@
           id="quantity"
           class="flex-auto"
           autocomplete="off"
+          required="true"
           v-model="barang.quantity"
         />
       </div>
@@ -26,6 +28,7 @@
           id="price"
           class="flex-auto"
           autocomplete="off"
+          required="true"
           v-model="barang.price"
         />
       </div>

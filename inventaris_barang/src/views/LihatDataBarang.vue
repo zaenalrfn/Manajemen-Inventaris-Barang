@@ -12,16 +12,33 @@
 <template>
   <div>
     <h2>Data Barang</h2>
+    <!-- bagian filter dan searc -->
+    <div class="flex justify-content-between">
+      <div class="flex gap-2 mb-2">
+        <InputText
+          id="search"
+          class="flex-auto"
+          autocomplete="off"
+          required="true"
+          placeholder="cari data"
+          v-model="searchData"
+          @keyup.enter="handleSearch"
+          @keyup.esc="handleReset"
+          @keyup.delete="handleRemoveSearch"
+        />
+        <ButtonVue label="Cari" @click="handleSearch" />
+      </div>
+    </div>
     <!-- bagian tabel data -->
     <div class="card">
       <DataTable
         class="tabel shadow-2"
-        :value="semuaBarang"
+        :value="barangFilter()"
         stripedRows
         tableStyle="width: 100%;"
       >
         <Column field="id" header="ID"></Column>
-        <Column field="nama" header="NAMA"></Column>
+        <Column field="nama" sortable header="NAMA"></Column>
         <Column field="quantity" header="QUANTITY"></Column>
         <Column field="price" header="PRICE"></Column>
         <Column header="AKSI">
@@ -86,6 +103,8 @@ const dialogOpen = ref(false);
 const total = ref(0);
 const edit = ref(false);
 const param = ref(0);
+const searchData = ref("");
+const searcing = ref(false);
 
 const pageNext = (e) => {
   Barang(e.page + 1);
@@ -95,6 +114,28 @@ const editBarang = (paramsId) => {
   dialogOpen.value = true;
   edit.value = true;
   param.value = paramsId;
+};
+
+const handleSearch = () => {
+  searcing.value = true;
+  Barang(1);
+};
+const handleReset = () => {
+  searchData.value = "";
+  searcing.value = false;
+  Barang(1);
+};
+const handleRemoveSearch = () => {
+  searcing.value = false;
+  Barang(1);
+};
+const barangFilter = () => {
+  if (!searcing.value) {
+    return semuaBarang.value;
+  }
+  return semuaBarang.value.filter((data) =>
+    data.nama.match(new RegExp(searchData.value, "i"))
+  );
 };
 
 const hapusBarang = (id) => {
@@ -135,11 +176,21 @@ const closeDialog = () => {
 
 const Barang = async (page = 1) => {
   try {
-    const response = await axios.get(
-      `http://localhost:3000/api/getData?page=${page}&limit=${10}`
-    );
-    semuaBarang.value = response.data.data;
-    total.value = response.data.pagination.total;
+    if (searcing.value) {
+      const responseAll = await axios.get(
+        "http://localhost:3000/api/getAllData"
+      );
+      semuaBarang.value = responseAll.data.data;
+      total.value = responseAll.data.total;
+      console.log("true");
+    } else {
+      const response = await axios.get(
+        `http://localhost:3000/api/getData?page=${page}&limit=${10}`
+      );
+      semuaBarang.value = response.data.data;
+      total.value = response.data.pagination.total;
+      console.log("false");
+    }
   } catch (error) {
     console.log(error);
   }

@@ -4,7 +4,37 @@ import db from "../database.js";
 import util from "util";
 import { error } from "console";
 const queryAsync = util.promisify(db.query).bind(db);
-// get | get semua data
+
+// get semua data
+export const getAllData = async (req, res) => {
+  const countQuery = "SELECT COUNT(*) AS total_count FROM barang";
+  db.query(countQuery, (err, countResult) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Gagal menghitung total data",
+        error: err.message,
+      });
+    }
+    const totalCount = countResult[0].total_count;
+    const queryBarang = "Select * FROM barang";
+    db.query(queryBarang, (err, result) => {
+      if (err) {
+        res.status(500).json({
+          message: "Gagal mengambil semua data",
+          error: error.message,
+        });
+      } else {
+        res.status(200).json({
+          data: result,
+          total: totalCount,
+          message: "Berhasil mengambil semua data",
+        });
+      }
+    });
+  });
+};
+
+// get | get halaman data
 export const getData = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;

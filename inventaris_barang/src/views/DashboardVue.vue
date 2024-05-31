@@ -23,6 +23,7 @@
 
       <!-- bagian tabel data -->
       <div class="card mt-5">
+        <h3>Data Terbaru</h3>
         <DataTable :value="dataTerakhir" stripedRows tableStyle="width: 100%;">
           <Column field="nama" header="NAMA"></Column>
           <Column field="quantity" header="QUANTITY"></Column>
@@ -43,12 +44,9 @@ const totalBarang = ref(0);
 const dataTerakhir = ref([]);
 
 onMounted(async () => {
-  const response = await axios.get("http://localhost:3000/api/getData");
-  totalBarang.value = response.data.pagination.total;
-  const data = JSON.parse(localStorage.getItem("data-barang-terakhir"));
-  dataTerakhir.value = data;
-  if (dataTerakhir.value.length == 5) {
-    dataTerakhir.value.pop();
-  }
+  const responsePerPage = await axios.get("http://localhost:3000/api/getData");
+  const responseAll = await axios.get("http://localhost:3000/api/getAllData");
+  totalBarang.value = responsePerPage.data.pagination.total;
+  dataTerakhir.value = responseAll.data.data.slice(-5);
 });
 </script>
