@@ -5,7 +5,7 @@ import router from "./router";
 import PrimeVue from "primevue/config";
 import "primeflex/primeflex.css";
 import "primeicons/primeicons.css";
-import "primevue/resources/themes/aura-light-teal/theme.css";
+import "primevue/resources/themes/aura-light-indigo/theme.css";
 import InputText from "primevue/inputtext";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";

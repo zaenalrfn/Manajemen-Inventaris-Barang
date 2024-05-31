@@ -1,13 +1,24 @@
+<style>
+.tabel {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.tabel .table {
+  border-radius: inherit;
+}
+</style>
 <template>
   <div>
     <h2>Data Barang</h2>
     <!-- bagian tabel data -->
     <div class="card">
       <DataTable
+        class="tabel shadow-2"
         :value="semuaBarang"
         stripedRows
-        showGridlines
-        tableStyle="width: 100%"
+        tableStyle="width: 100%;"
       >
         <Column field="id" header="ID"></Column>
         <Column field="nama" header="NAMA"></Column>
@@ -35,7 +46,7 @@
     </div>
 
     <!-- bagian pagination -->
-    <div class="card">
+    <div class="card mt-2">
       <Paginator
         v-model:first="first"
         :rows="10"
@@ -50,7 +61,7 @@
     <DialogVue
       v-model:visible="dialogOpen"
       modal
-      header="Tambah Data Barang"
+      header="Edit data barang"
       :style="{ width: '25rem' }"
     >
       <span class="p-text-secondary block mb-5">Masukkan data barang</span>
@@ -66,6 +77,7 @@ import { onMounted, ref } from "vue";
 import axios from "axios";
 import Paginator from "primevue/paginator";
 import FormTambahData from "../components/TambahData/FormTambahData.vue";
+import Swal from "sweetalert2";
 
 // import { ProductService } from "@/service/ProductService";
 
@@ -83,6 +95,38 @@ const editBarang = (paramsId) => {
   dialogOpen.value = true;
   edit.value = true;
   param.value = paramsId;
+};
+
+const hapusBarang = (id) => {
+  Swal.fire({
+    title: "Apa kamu yakin?",
+    text: "Anda tidak akan dapat mengembalikan ini!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Hapus",
+    cancelButtonText: "Tidak",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        await axios.delete(`http://localhost:3000/api/hapusBarang/${id}`);
+        Swal.fire({
+          title: "Deleted!",
+          text: "Barang berhasil dihapus",
+          icon: "success",
+        }).then(() => {
+          location.reload();
+        });
+      } catch (error) {
+        Swal.fire({
+          title: "Error!",
+          text: "Barang gagal dihapus",
+          icon: "error",
+        });
+      }
+    }
+  });
 };
 
 const closeDialog = () => {

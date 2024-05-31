@@ -46,12 +46,9 @@
 
 <script setup>
 import axios from "axios";
+import Swal from "sweetalert2";
 import { reactive } from "vue";
-import { useToast } from "primevue/usetoast";
-import Toast from "primevue/toast";
 import { onMounted } from "vue";
-
-const toast = useToast();
 
 const emit = defineEmits(["dialog"]);
 const props = defineProps({
@@ -71,6 +68,16 @@ const barang = reactive({
   quantity: "",
   price: "",
 });
+let barangT = JSON.parse(localStorage.getItem("data-barang-terakhir")) || [];
+const barangTerakhir = (nama, quantity, price) => {
+  let dataTerakhir = {
+    nama: nama,
+    quantity: quantity,
+    price: price,
+  };
+  barangT.push(dataTerakhir);
+  localStorage.setItem("data-barang-terakhir", JSON.stringify(barangT));
+};
 
 // bagian load barang yang mau diupdate
 const loadBarang = async (id) => {
@@ -82,20 +89,9 @@ const loadBarang = async (id) => {
       barang.quantity = d.quantity;
       barang.price = d.price;
     }
-
-    console.log(data);
   } catch (error) {
     console.log(error);
   }
-};
-
-const show = () => {
-  toast.add({
-    severity: "info",
-    summary: "Info",
-    detail: "Message Content",
-    life: 3000,
-  });
 };
 
 // bagian fungsi untuk menghandle tambah data
@@ -110,12 +106,57 @@ const handleSubmit = async () => {
           price: barang.price,
         }
       );
+      const toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+      toast
+        .fire({
+          icon: "success",
+          title: `Barang dengan id ${props.paramsId} diedit`,
+        })
+        .then((result) => {
+          // Kondisi untuk reload halaman setelah 3000ms (3 detik)
+          if (result.dismiss === Swal.DismissReason.timer) {
+            location.reload();
+          }
+        });
     } else {
       await axios.post("http://localhost:3000/api/tambahBarang", {
         nama: barang.nama,
         quantity: barang.quantity,
         price: barang.price,
       });
+      const toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+      toast
+        .fire({
+          icon: "success",
+          title: "Berhasil menambahkan barang",
+        })
+        .then((result) => {
+          barangTerakhir(barang.nama, barang.quantity, barang.price);
+          // Kondisi untuk reload halaman setelah 3000ms (3 detik)
+          if (result.dismiss === Swal.DismissReason.timer) {
+            location.reload();
+          }
+        });
     }
     emit("dialog");
   } catch (error) {
