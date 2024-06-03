@@ -1,3 +1,14 @@
+<style>
+.tabel {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.tabel .table {
+  border-radius: inherit;
+}
+</style>
 <template>
   <div>
     <!-- bagian side bar -->
@@ -24,7 +35,12 @@
       <!-- bagian tabel data -->
       <div class="card mt-5">
         <h3>Data Terbaru</h3>
-        <DataTable :value="dataTerakhir" stripedRows tableStyle="width: 100%;">
+        <DataTable
+          :value="dataTerakhir"
+          stripedRows
+          tableStyle="width: 100%;"
+          class="tabel shadow-2"
+        >
           <Column field="nama" header="NAMA"></Column>
           <Column field="quantity" header="QUANTITY"></Column>
           <Column field="price" header="PRICE"></Column>
